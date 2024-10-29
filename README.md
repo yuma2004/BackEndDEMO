@@ -7,7 +7,7 @@
 ### 1. 環境構築
 
 - [x] **プロジェクト作成**: 新しいディレクトリを作成し、`npm init -y` でプロジェクトを初期化。必要なパッケージ（`express`, `jsonwebtoken`, `mongoose`, `bcrypt`, `body-parser`, `cors`など）をインストール。
-- [x] **MongoDB の設定**: MongoDB Atlas のアカウントを作成し、新しいデータベースを作成。ローカル環境で実行する場合は、MongoDB をインストールし、`mongod` コマンドでサーバーを起動。
+- [] **MongoDB の設定**: MongoDB Atlas のアカウントを作成し、新しいデータベースを作成。ローカル環境で実行する場合は、MongoDB をインストールし、`mongod` コマンドでサーバーを起動。
 
 ### 2. サーバーとルーティングの設定
 
