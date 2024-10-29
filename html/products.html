@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>商品一覧</title>
+</head>
+<body>
+    <button onclick="history.back()">戻る</button>
+  <h1>商品一覧</h1>
+  <ul id="productList"></ul>
+  <p id="message"></p>
+  <script>
+    async function fetchProducts() {
+      try {
+        const response = await fetch('http://localhost:3000/api/products');
+        const products = await response.json();
+        const productList = document.getElementById('productList');
+        productList.innerHTML = '';
+        products.forEach(product => {
+          const li = document.createElement('li');
+          li.textContent = `${product.name} - ¥${product.price}`;
+          const addButton = document.createElement('button');
+          addButton.textContent = 'カートに追加';
+          addButton.onclick = () => addToCart(product._id);
+          li.appendChild(addButton);
+          productList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('エラー:', error);
+      }
+    }
+
+    async function addToCart(productId) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:3000/api/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ productId, quantity: 1 })
+        });
+        const data = await response.json();
+        document.getElementById('message').textContent = data.message || data.error;
+      } catch (error) {
+        console.error('エラー:', error);
+      }
+    }
+
+    fetchProducts();
+  </script>
+</body>
+</html>

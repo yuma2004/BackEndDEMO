@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>注文履歴</title>
+</head>
+<body>
+    <button onclick="history.back()">戻る</button>
+  <h1>注文履歴</h1>
+  <ul id="orderList"></ul>
+  <p id="message"></p>
+
+  <script>
+    async function fetchOrders() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:3000/api/orders', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const orders = await response.json();
+        const orderList = document.getElementById('orderList');
+        orderList.innerHTML = '';
+        orders.forEach(order => {
+          const li = document.createElement('li');
+          li.textContent = `注文ID: ${order._id} - ステータス: ${order.status}`;
+          orderList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('エラー:', error);
+      }
+    }
+
+    fetchOrders();
+  </script>
+</body>
+</html>
