@@ -19,7 +19,12 @@ app.use(express.json()); // JSON リクエストの解析
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/html/login.html');
   });
-app.use(express.static('html')); // 静的ファイルの提供
+app.use(express.static('/html')); // 静的ファイルの提供
+
+// register.htmlを表示するルート
+app.get('/register', (req, res) => {
+  res.sendFile(__dirname + '/html/register.html');
+});
 
 // ルーティングファイルのインポート
 const usersRouter = require('./routes/users');
