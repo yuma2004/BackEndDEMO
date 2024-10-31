@@ -7,11 +7,11 @@
 ### 1. 環境構築
 
 - [x] **プロジェクト作成**: 新しいディレクトリを作成し、`npm init -y` でプロジェクトを初期化。必要なパッケージ（`express`, `jsonwebtoken`, `mongoose`, `bcrypt`, `body-parser`, `cors`など）をインストール。
-- [] **MongoDB の設定**: MongoDB Atlas のアカウントを作成し、新しいデータベースを作成。ローカル環境で実行する場合は、MongoDB をインストールし、`mongod` コマンドでサーバーを起動。
+- [x] **MongoDB の設定**: MongoDB Atlas のアカウントを作成し、新しいデータベースを作成。ローカル環境で実行する場合は、MongoDB をインストールし、`mongod` コマンドでサーバーを起動。
 
 ### 2. サーバーとルーティングの設定
 
-- [ ] **Express サーバーの設定**: `server.js` ファイルを作成し、`express` と `body-parser` でリクエストを処理できるように設定。`cors` を設定し、フロントエンドと通信できるようにする。
+- [x] **Express サーバーの設定**: `server.js` ファイルを作成し、`express` と `body-parser` でリクエストを処理できるように設定。`cors` を設定し、フロントエンドと通信できるようにする。
 - [ ] **API ルーティングの基本構造**: `routes` フォルダを作成し、`users.js`, `products.js`, `cart.js`, `orders.js` のルーティングファイルを作成。`server.js` でルーティングをインポートして、APIエンドポイントをルーティングに接続。
 
 ### 3. モデルの作成
