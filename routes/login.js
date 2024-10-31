@@ -3,10 +3,9 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User.js'); // ユーザーモデルのインポート
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
+// const dotenv = require('dotenv'); // server.js で dotenv.config() を呼び出しているため不要
 
-// 環境変数の設定
-dotenv.config();
+// 環境変数の設定は server.js で既に行われているため不要
 
 /**
  * 新規ユーザー登録エンドポイント
@@ -36,11 +35,10 @@ router.post('/register', async (req, res) => {
  * ログインエンドポイント
  */
 router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
 
   console.log('JWT_SECRET:', process.env.JWT_SECRET);
   
-  const { username, password } = req.body;
-
   try {
     // ユーザーの存在確認
     const user = await User.findOne({ username });
@@ -49,6 +47,11 @@ router.post('/login', async (req, res) => {
     }
 
     // パスワードの検証
+    if (typeof user.comparePassword !== 'function') {
+      console.error('comparePassword メソッドが定義されていません。');
+      return res.status(500).json({ error: '内部サーバーエラー' });
+    }
+
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(400).json({ error: 'ユーザー名またはパスワードが正しくありません。' });

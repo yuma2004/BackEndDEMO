@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+// ユーザースキーマの定義
 const userSchema = new mongoose.Schema({
   username: { 
     type: String, 
@@ -33,11 +34,7 @@ userSchema.pre('save', async function(next) {
 
 // パスワードの検証メソッド
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  try {
-    return await bcrypt.compare(candidatePassword, this.password);
-  } catch (error) {
-    throw error;
-  }
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // モデルのエクスポート

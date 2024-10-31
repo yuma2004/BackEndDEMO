@@ -27,9 +27,19 @@
           body: JSON.stringify({ username, password })
         });
         const data = await response.json();
+        // メッセージ表示
         document.getElementById('message').textContent = data.message || data.error;
+
+            // 登録が成功した場合にログイン画面へ遷移
+        if (data.message) { // ここではdata.messageが存在する場合を成功と判断
+          // 2秒（2000ミリ秒）待ってからログイン画面にリダイレクト
+          setTimeout(() => {
+            window.location.href = '/'; // ログイン画面のURLに置き換えてください
+          }, 2000);
+        }
       } catch (error) {
         console.error('エラー:', error);
+        document.getElementById('message').textContent = '登録中にエラーが発生しました。';
       }
     });
   </script>

@@ -12,12 +12,71 @@
             <p class="fsize">ログイン画面</p>
             <input type="text" id="username" placeholder="ユーザー名">
             <input type="password" id="password" placeholder="パスワード">
-            <input type="checkbox" id="showpassword" onclick="showOrHide()"> パスワードを表示
+            <input type="checkbox" id="showpassword" onclick="showOrHidePassword()"> パスワードを表示
             <button type="submit">ログイン</button>
         </form>
     </div>
     <p id="error-message"></p>
     <button type="button" onclick="location.href='/register'">アカウント登録</button>
-    <script src="../js-css/login.js\"></script>
+
+
+    <script>
+
+           // パスワード表示・非表示用の関数（DOMContentLoaded の外で定義）
+        function showOrHidePassword() {
+            const passwordField = document.getElementById("password");
+            const isChecked = document.getElementById("showpassword").checked;
+            passwordField.type = isChecked ? "text" : "password";
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+          const loginForm = document.getElementById('loginForm');
+          const usernameInput = document.getElementById('username');
+          const passwordInput = document.getElementById('password');
+          const errorMessage = document.getElementById('error-message');
+    
+          // submit イベント発生時に login 関数を呼び出す
+          loginForm.addEventListener('submit', login);
+
+          async function login(event) {
+            event.preventDefault(); // デフォルトのフォーム送信を防ぐ
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+    
+            try {
+              const response = await fetch('http://localhost:3000/api/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+              });
+    
+              const data = await response.json();
+    
+              if (response.ok) {
+                // ログイン成功
+                // トークンをローカルストレージに保存（必要に応じて）
+                localStorage.setItem('token', data.token);
+    
+                // 成功メッセージを表示
+                errorMessage.textContent = data.message;
+                errorMessage.style.color = 'green';
+    
+                // 2秒後にリダイレクト
+                setTimeout(() => {
+                  window.location.href = '/index'; // ログイン後のページに変更
+                }, 2000);
+              } else {
+                // エラー時のメッセージ表示
+                errorMessage.textContent = data.error || 'ログインに失敗しました。';
+                errorMessage.style.color = 'red';
+              }
+            } catch (error) {
+              console.error('エラー:', error);
+              errorMessage.textContent = 'ログイン処理中にエラーが発生しました。';
+              errorMessage.style.color = 'red';
+            }
+          }
+        });
+    </script>
 </body>
 </html>
