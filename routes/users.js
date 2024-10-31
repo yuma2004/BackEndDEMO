@@ -1,11 +1,12 @@
 // routes/users.js
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // ユーザーモデルのインポート
+const User = require('../models/User.js'); // ユーザーモデルのインポート
 
 // 新規ユーザー登録エンドポイント
 router.post('/register', async (req, res) => {
   const { username, password } = req.body;
+  console.log(username)
   
   try {
     // 新しいユーザーの作成
