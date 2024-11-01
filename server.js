@@ -13,9 +13,6 @@ const PORT = process.env.PORT || 3000;
 // MongoDB の接続設定
 const mongoURI = process.env.MONGODB_URI;
 
-console.log('PORT:', process.env.PORT);
-console.log('MongoDB URI:', process.env.MONGODB_URI);
-
 // MongoDB の接続設定
 mongoose.connect(mongoURI)
   .then(() => console.log('MongoDB に接続されました'))
@@ -62,17 +59,24 @@ app.get('/products', (req, res) => {
   res.sendFile(__dirname + '/html/products.html');
 });
 
+//admin.htmlを表示するルート
+app.get('/admin', (req, res) => {
+  res.sendFile(__dirname + '/html/admin.html');
+});
+
 // ルーティングファイルのインポート
 const usersRouter = require('./routes/users');
 const productsRouter = require('./routes/products');
 const cartRouter = require('./routes/cart');
 const ordersRouter = require('./routes/orders');
+const adminRouter = require('./routes/admin');
 
 // ルートの設定
 app.use('/api/users', usersRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/orders', ordersRouter);
+app.use('/api/admin', adminRouter);
 
 // サーバーの起動
 app.listen(PORT, () => {

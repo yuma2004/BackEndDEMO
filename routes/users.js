@@ -37,7 +37,7 @@ router.post('/register', async (req, res) => {
  */
 router.post('/login', async (req, res) => {
 
-  console.log('JWT_SECRET:', process.env.JWT_SECRET);
+  console.log("ログインエンドポイントにリクエストが来ました");
   
   const { username, password } = req.body;
 
@@ -54,8 +54,8 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'ユーザー名またはパスワードが正しくありません。' });
     }
 
-    // JWTの生成
-    const payload = { userId: user._id, username: user.username };
+    // JWTの生成して管理者フラグをトークンに含める
+    const payload = { userId: user._id, username: user.username, isAdmin: user.isAdmin };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // 成功レスポンスの送信

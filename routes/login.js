@@ -60,6 +60,7 @@ router.post('/login', async (req, res) => {
     // JWTの生成
     const payload = { userId: user._id, username: user.username };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    console.log("生成されたトークン:", token); // トークンが生成されたことを確認
 
     // 成功レスポンスの送信
     res.json({ message: 'ログインに成功しました。', token });

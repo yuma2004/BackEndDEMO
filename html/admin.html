@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理者用商品登録</title>
+</head>
+<body>
+  <h1>商品登録</h1>
+  <form id="productForm">
+    <label for="name">商品名:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <label for="price">価格:</label>
+    <input type="number" id="price" name="price" required>
+    <br>
+    <button type="button" onclick="registerProduct()">登録</button>
+  </form>
+  <p id="message"></p>
+
+  <script>
+    async function registerProduct() {
+      const name = document.getElementById('name').value;
+      const price = parseFloat(document.getElementById('price').value); // 数値
+      const token = localStorage.getItem('adminToken'); // 管理者トークン
+
+      console.log("取得したトークン1:", token);
+
+      if (!token) {
+        document.getElementById('message').textContent = '管理者トークンがありません。ログインしてください。';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/api/admin/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ name, price })
+        });
+        const data = await response.json();
+        document.getElementById('message').textContent = data.message || data.error;
+      } catch (error) {
+        console.error('エラー:', error);
+        document.getElementById('message').textContent = '商品登録に失敗しました。';
+      }
+    }
+  </script>
+</body>
+</html>
