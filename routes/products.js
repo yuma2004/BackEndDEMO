@@ -30,9 +30,9 @@ router.get('/:id', async (req, res) => {
 
 // 商品登録エンドポイント（管理者のみ）
 router.post('/', authenticateAdmin, async (req, res) => {
-  const { name, price } = req.body;
+  const { name, price, category, description, stock } = req.body;
   try {
-    const newProduct = new Product({ name, price });
+    const newProduct = new Product({ name, price, category, description, stock });
     await newProduct.save();
     res.status(201).json({ message: '商品が登録されました。', product: newProduct });
   } catch (error) {

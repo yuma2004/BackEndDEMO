@@ -42,12 +42,16 @@
           body: JSON.stringify({ productId, quantity: 1 })
         });
         const data = await response.json();
-        document.getElementById('message').textContent = data.message || data.error;
+        if (response.ok) {
+          document.getElementById('message').textContent = data.message;
+        } else {
+          document.getElementById('message').textContent = data.error || 'カートに追加できませんでした';
+        }
       } catch (error) {
         console.error('エラー:', error);
+        document.getElementById('message').textContent = 'サーバーエラーです';
       }
     }
-
     fetchProducts();
   </script>
 </body>

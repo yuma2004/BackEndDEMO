@@ -23,8 +23,15 @@
         cartList.innerHTML = '';
         (cart.items || []).forEach(item => {
           const li = document.createElement('li');
-          li.textContent = `${item.product.name} - 数量: ${item.quantity}`;
-          cartList.appendChild(li);
+
+      // productが存在するかを確認してからnameにアクセス
+      if (item.product && item.product.name) {
+        li.textContent = `${item.product.name} - 数量: ${item.quantity}`;
+      } else {
+        li.textContent = `商品情報が見つかりません - 数量: ${item.quantity}`;
+      }
+
+      cartList.appendChild(li);
         });
       } catch (error) {
         console.error('エラー:', error);

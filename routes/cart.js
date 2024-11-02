@@ -14,8 +14,15 @@ router.post('/', async (req, res) => {
   }
 
   try {
+    // 商品が存在するかチェック
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: '指定された商品が見つかりません' });
+    }
+
     // 既存のカートアイテムをチェック
     let cart = await Cart.findOne({ user: userId });
+    
     if (cart) {
       // カートに同じ商品があるか確認
       const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
