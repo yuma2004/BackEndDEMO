@@ -18,7 +18,7 @@
         productList.innerHTML = '';
         products.forEach(product => {
           const li = document.createElement('li');
-          li.textContent = `${product.name} - ¥${product.price}`;
+          li.textContent = `${product.name} - ¥${product.price} -在庫${product.stock}個`;
           const addButton = document.createElement('button');
           addButton.textContent = 'カートに追加';
           addButton.onclick = () => addToCart(product._id);

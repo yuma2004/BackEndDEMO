@@ -8,6 +8,7 @@
     <button onclick="history.back()">戻る</button>
   <h1>カート</h1>
   <ul id="cartList"></ul>
+  <button onclick="placeOrder()">注文する</button>
   <p id="message"></p>
 
   <script>
@@ -35,6 +36,29 @@
         });
       } catch (error) {
         console.error('エラー:', error);
+      }
+    }
+
+    async function placeOrder() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:3000/api/orders', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        const data = await response.json();
+        if (response.ok) {
+          document.getElementById('message').textContent = data.message;
+          fetchCart(); // カートをリフレッシュして空にする
+        } else {
+          document.getElementById('message').textContent = data.error || '注文に失敗しました';
+        }
+      } catch (error) {
+        console.error('エラー:', error);
+        document.getElementById('message').textContent = 'サーバーエラーです';
       }
     }
 

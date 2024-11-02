@@ -1,53 +1,68 @@
+// routes/order.js
 const express = require('express');
 const router = express.Router();
-const Order = require('../models/order');
-const Product = require('../models/product'); // 在庫チェックに使用
-const authenticateUser = require('../middleware/auth'); // 認証用ミドルウェア（仮）
+const Cart = require('../models/cart'); // カートモデル
+const Order = require('../models/order'); // 注文モデル
+const Product = require('../models/product'); // 商品モデル
 
-// 注文作成エンドポイント
+// カート内の商品を注文に変換するエンドポイント
 router.post('/', async (req, res) => {
-  const { products } = req.body;
+  const userId = req.session.userId; // セッションからユーザーIDを取得
+
+  if (!userId) {
+    return res.status(401).json({ error: 'ユーザーが認証されていません' });
+  }
 
   try {
-    // 注文内容の検証と在庫の確認
-    const orderItems = await Promise.all(products.map(async item => {
-      const product = await Product.findById(item.product);
-      if (!product) {
-        throw new Error(`商品が見つかりません: ${item.product}`);
-      }
-      if (product.stock < item.quantity) {
-        throw new Error(`在庫が不足しています: ${product.name}`);
-      }
-      return { product: product._id, quantity: item.quantity };
+    // ユーザーのカートを取得して、商品情報を展開
+    const cart = await Cart.findOne({ user: userId }).populate('items.product');
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ error: 'カートが空です' });
+    }
+
+    // カート内容を注文に変換
+    const orderItems = cart.items.map(item => ({
+      product: item.product._id,
+      quantity: item.quantity
     }));
 
-    // 注文をデータベースに保存
+    // 注文を作成し、Orderスキーマに従って保存
     const order = new Order({
-      user: req.user._id,
+      user: userId,
       products: orderItems,
       orderDate: Date.now(),
       status: 'Pending'
     });
     await order.save();
 
-    // 在庫を更新
-    for (const item of products) {
-      await Product.findByIdAndUpdate(item.product, {
+    // 各商品の在庫を更新
+    for (const item of cart.items) {
+      await Product.findByIdAndUpdate(item.product._id, {
         $inc: { stock: -item.quantity }
       });
     }
 
+    // カートを空にする
+    await Cart.findOneAndUpdate({ user: userId }, { items: [] });
+
+    // 注文成功のレスポンスを返す
     res.status(201).json({ message: '注文が作成されました', order });
   } catch (error) {
     console.error('注文作成エラー:', error);
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: 'サーバーエラーです' });
   }
 });
 
-// 特定のユーザーの注文一覧取得エンドポイント
-router.get('/user/:userId', authenticateUser, async (req, res) => {
+// 注文履歴を取得するエンドポイント (GET /api/orders)
+router.get('/', async (req, res) => {
+  const userId = req.session.userId;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'ユーザーが認証されていません' });
+  }
+
   try {
-    const orders = await Order.find({ user: req.params.userId }).populate('products.product');
+    const orders = await Order.find({ user: userId }).populate('products.product');
     res.json(orders);
   } catch (error) {
     console.error('注文取得エラー:', error);
@@ -55,47 +70,5 @@ router.get('/user/:userId', authenticateUser, async (req, res) => {
   }
 });
 
-// 特定の注文取得エンドポイント
-router.get('/:id', authenticateUser, async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id).populate('products.product');
-    if (!order) {
-      return res.status(404).json({ error: '注文が見つかりません' });
-    }
-    res.json(order);
-  } catch (error) {
-    console.error('注文詳細取得エラー:', error);
-    res.status(500).json({ error: 'サーバーエラーです' });
-  }
-});
-
-// 注文のステータス更新エンドポイント
-router.put('/:id', authenticateUser, async (req, res) => {
-  const { status } = req.body;
-  try {
-    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
-    if (!order) {
-      return res.status(404).json({ error: '注文が見つかりません' });
-    }
-    res.json({ message: '注文のステータスが更新されました', order });
-  } catch (error) {
-    console.error('注文更新エラー:', error);
-    res.status(500).json({ error: 'サーバーエラーです' });
-  }
-});
-
-// 注文削除エンドポイント
-router.delete('/:id', authenticateUser, async (req, res) => {
-  try {
-    const order = await Order.findByIdAndDelete(req.params.id);
-    if (!order) {
-      return res.status(404).json({ error: '注文が見つかりません' });
-    }
-    res.json({ message: '注文が削除されました', order });
-  } catch (error) {
-    console.error('注文削除エラー:', error);
-    res.status(500).json({ error: 'サーバーエラーです' });
-  }
-});
 
 module.exports = router;

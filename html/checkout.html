@@ -5,7 +5,7 @@
   <title>注文履歴</title>
 </head>
 <body>
-    <button onclick="history.back()">戻る</button>
+  <button onclick="history.back()">戻る</button>
   <h1>注文履歴</h1>
   <ul id="orderList"></ul>
   <p id="message"></p>
@@ -20,16 +20,39 @@
             'Authorization': `Bearer ${token}`
           }
         });
+
+        if (!response.ok) {
+          document.getElementById('message').textContent = '注文履歴の取得に失敗しました';
+          return;
+        }
+
         const orders = await response.json();
         const orderList = document.getElementById('orderList');
         orderList.innerHTML = '';
+
+        // 各注文のデータを表示
         orders.forEach(order => {
-          const li = document.createElement('li');
-          li.textContent = `注文ID: ${order._id} - ステータス: ${order.status}`;
-          orderList.appendChild(li);
+          const orderItem = document.createElement('li');
+          orderItem.innerHTML = `
+            <strong>注文ID:</strong> ${order._id}<br>
+            <strong>ステータス:</strong> ${order.status}<br>
+            <strong>注文日:</strong> ${new Date(order.orderDate).toLocaleDateString()}<br>
+            <strong>注文商品:</strong>
+          `;
+
+          const productList = document.createElement('ul');
+          order.products.forEach(product => {
+            const productItem = document.createElement('li');
+            productItem.textContent = `${product.product.name} - 数量: ${product.quantity}`;
+            productList.appendChild(productItem);
+          });
+
+          orderItem.appendChild(productList);
+          orderList.appendChild(orderItem);
         });
       } catch (error) {
         console.error('エラー:', error);
+        document.getElementById('message').textContent = 'サーバーエラーです';
       }
     }
 
