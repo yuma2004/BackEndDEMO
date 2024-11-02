@@ -36,9 +36,9 @@
         const response = await fetch('http://localhost:3000/api/cart', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Content-Type': 'application/json'
           },
+          credentials: 'include', // クッキーを送信
           body: JSON.stringify({ productId, quantity: 1 })
         });
         const data = await response.json();

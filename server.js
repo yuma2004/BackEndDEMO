@@ -1,5 +1,6 @@
 // server.js
 const express = require('express');
+const session = require('express-session');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -23,8 +24,18 @@ mongoose.connect(mongoURI)
 
 
 // ミドルウェアの設定
-app.use(cors()); // CORS を有効にする
+app.use(cors({
+  origin: 'http://localhost:3000', // フロントエンドのURLに変更
+  credentials: true // クッキーを許可
+})); // CORS を有効にする
 app.use(express.json()); // JSON リクエストの解析
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your_session_secret', // 環境変数に設定することを推奨
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // 本番では secure: true に設定
+}));
 
 // テスト用のルート
 app.get('/', (req, res) => {
@@ -66,13 +77,16 @@ app.get('/admin', (req, res) => {
 
 // ルーティングファイルのインポート
 const usersRouter = require('./routes/users');
+const loginRouter = require('./routes/login');
 const productsRouter = require('./routes/products');
 const cartRouter = require('./routes/cart');
 const ordersRouter = require('./routes/orders');
 const adminRouter = require('./routes/admin');
 
+
 // ルートの設定
 app.use('/api/users', usersRouter);
+app.use('/api/login',loginRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/orders', ordersRouter);

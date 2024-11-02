@@ -1,40 +1,13 @@
-// routes/users.js
+// routes/login.js
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User.js'); // ユーザーモデルのインポート
 const jwt = require('jsonwebtoken');
-// const dotenv = require('dotenv'); // server.js で dotenv.config() を呼び出しているため不要
-
-// 環境変数の設定は server.js で既に行われているため不要
-
-/**
- * 新規ユーザー登録エンドポイント
- */
-router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  console.log(`新規登録ユーザー: ${username}`);
-  
-  try {
-    // 既存ユーザーの確認
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ error: 'このユーザー名は既に使用されています。' });
-    }
-
-    // 新しいユーザーの作成
-    const newUser = new User({ username, password });
-    await newUser.save(); // データベースに保存
-    res.status(201).json({ message: 'ユーザーが登録されました' });
-  } catch (error) {
-    console.error('ユーザー登録エラー:', error);
-    res.status(500).json({ error: 'ユーザーの登録に失敗しました' });
-  }
-});
 
 /**
  * ログインエンドポイント
  */
-router.post('/login', async (req, res) => {
+router.post('/', async (req, res) => {
   const { username, password } = req.body;
 
   console.log('JWT_SECRET:', process.env.JWT_SECRET);
@@ -61,6 +34,9 @@ router.post('/login', async (req, res) => {
     const payload = { userId: user._id, username: user.username };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
     console.log("生成されたトークン:", token); // トークンが生成されたことを確認
+
+    // セッションにユーザーIDを保存
+    req.session.userId = user._id;
 
     // 成功レスポンスの送信
     res.json({ message: 'ログインに成功しました。', token });

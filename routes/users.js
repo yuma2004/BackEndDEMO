@@ -32,38 +32,4 @@ router.post('/register', async (req, res) => {
   }
 });
 
-/**
- * ログインエンドポイント
- */
-router.post('/login', async (req, res) => {
-
-  console.log("ログインエンドポイントにリクエストが来ました");
-  
-  const { username, password } = req.body;
-
-  try {
-    // ユーザーの存在確認
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(400).json({ error: 'ユーザー名またはパスワードが正しくありません。' });
-    }
-
-    // パスワードの検証
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ error: 'ユーザー名またはパスワードが正しくありません。' });
-    }
-
-    // JWTの生成して管理者フラグをトークンに含める
-    const payload = { userId: user._id, username: user.username, isAdmin: user.isAdmin };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    // 成功レスポンスの送信
-    res.json({ message: 'ログインに成功しました。', token });
-  } catch (error) {
-    console.error('ログインエラー:', error);
-    res.status(500).json({ error: 'ログイン処理中にエラーが発生しました。' });
-  }
-});
-
 module.exports = router;

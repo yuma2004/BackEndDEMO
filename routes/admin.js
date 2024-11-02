@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/product');
 const jwt = require('jsonwebtoken');
+const authenticateAdmin = require('../middleware/auth'); // 認証ミドルウェアをインポート
 
 // 管理者用の商品登録エンドポイント
 router.post('/products', async (req, res) => {
@@ -28,8 +29,9 @@ router.post('/products', async (req, res) => {
     } else if (error.name === 'ValidationError') {
         return res.status(400).json({ error: '入力データに誤りがあります。' });
     }
-    res.status(500).json({ error: 'サーバーエラーです。' });
+    res.status(500).json({ error: '0サーバーエラーです。' });
   }
 });
 
 module.exports = router;
+

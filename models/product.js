@@ -1,16 +1,12 @@
-const express = require('express');
-const router = express.Router();
-const Product = require('../models/product');
+// models/product.js
+const mongoose = require('mongoose');
 
-// 商品一覧取得ルート
-router.get('/', async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.json(products);
-  } catch (error) {
-    console.error('商品一覧取得エラー:', error); // エラーログの追加
-    res.status(500).json({ error: 'サーバーエラーです。' });
-  }
+const productSchema = new mongoose.Schema({
+  name: { type: String, required: true },       // 商品名（必須）
+  price: { type: Number, required: true },      // 価格（必須）
+  stock: { type: Number, default: 0 },          // 在庫数（デフォルト0）
+  description: { type: String },                // 説明
+  category: { type: String }                    // カテゴリ
 });
 
-module.exports = router;
+module.exports = mongoose.model('Product', productSchema); // "Product" モデルをエクスポート

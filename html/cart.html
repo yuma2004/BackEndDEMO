@@ -16,16 +16,14 @@
         const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:3000/api/cart', {
           method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          credentials: 'include', // クッキーを含める
         });
         const cart = await response.json();
         const cartList = document.getElementById('cartList');
         cartList.innerHTML = '';
         (cart.items || []).forEach(item => {
           const li = document.createElement('li');
-          li.textContent = `${item.productId.name} - 数量: ${item.quantity}`;
+          li.textContent = `${item.product.name} - 数量: ${item.quantity}`;
           cartList.appendChild(li);
         });
       } catch (error) {
